@@ -559,12 +559,14 @@ if (volumeBar) {
     // 👇 ΕΔΩ ΒΑΖΕΤΕ ΤΟ LINK ΣΑΣ! (Είτε .m3u8 ζωντανής ροής, είτε .mp4 βίντεο)
     const videoSource = "https://eco.streams.ovh:8081/barazatv/index.m3u8"; 
 
-    // 🛡️ ANTI-SHOCK ΡΥΘΜΙΣΕΙΣ ΓΙΑ ΝΑ ΜΗΝ ΚΟΛΛΑΕΙ ΤΟ LIVE ΒΙΝΤΕΟ ΣΤΑ ΚΙΝΗΤΑ
+      // Ορίζουμε το hls global για να μπορούμε να το ελέγχουμε παντού στον κώδικα
+  let hls = null;
+
   if (videoElement) {
     if (videoSource.endsWith('.m3u8')) {
       if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-        const hls = new Hls({
-          maxBufferLength: 30,       // 30 δευτερόλεπτα κρυφή μνήμη
+        hls = new Hls({
+          maxBufferLength: 30,
           maxMaxBufferLength: 60,
           maxBufferSize: 30 * 1000 * 1000,
           enableWorker: true,
@@ -586,6 +588,7 @@ if (volumeBar) {
       videoElement.src = videoSource;
     }
   }
+
 
       // 🔊 Λειτουργία για το άνοιγμα/κλείσιμο του ήχου του βίντεο
     function toggleVideoSound() {
@@ -644,7 +647,7 @@ if (volumeBar) {
     }
   ];
 
-  // 4. Ο ΜΗΧΑΝΙΣΜΟΣ ΠΟΥ ΠΑΙΖΕΙ ΤΑ ΤΡΑΓΟΥΔΙΑ ON-DEMAND
+    // 4. Ο ΕΝΙΣΧΥΜΕΝΟΣ ΜΗΧΑΝΙΣΜΟΣ ΠΟΥ ΠΑΙΖΕΙ ΚΑΙ .MP3 ΚΑΙ .MP4 ON-DEMAND
   function playOnDemand(index) {
     const track = onDemandTracks[index];
     if (!track) return;
@@ -659,29 +662,41 @@ if (volumeBar) {
     document.getElementById('song-title').innerText = track.title;
     document.getElementById('artist-name').innerText = track.artist;
 
+    // 🚨 ΚΛΕΙΔΙ: Αν τρέχει live stream, αποσυνδέουμε την hls.js για να μην μπλοκάρει την οθόνη
+    if (hls) {
+      hls.detachMedia();
+    }
+
     if (track.isTextOnly) {
-      // ΑΝ ΕΙΝΑΙ MP3 (ΗΧΟΣ): Φορτώνουμε τον ήχο στο audio αντικείμενο και επαναφέρουμε το bg-video στο αθόρυβο
+      // ΑΝ ΕΙΝΑΙ MP3 (ΗΧΟΣ): Φορτώνουμε τον ήχο στο audio
       audio.src = track.fileUrl;
       audio.load();
       audio.play().catch(e => console.log(e));
       
-      // Επαναφέρουμε το κανονικό background βίντεο να παίζει
+      // Επαναφέρουμε το αρχικό live βίντεο (ξανασυνδέοντας την hls.js αν ήταν m3u8)
       if (videoElement) {
-        videoElement.src = videoSource;
+        if (videoSource.endsWith('.m3u8') && hls) {
+          hls.attachMedia(videoElement);
+          hls.loadSource(videoSource);
+        } else {
+          videoElement.src = videoSource;
+        }
         videoElement.muted = true;
         videoElement.style.display = 'block';
       }
     } else {
-      // ΑΝ ΕΙΝΑΙ MP4 (ΒΙΝΤΕΟ ΚΛΙΠ): Φορτώνουμε το νέο βίντεο στην κεντρική οθόνη και του ΑΝΟΙΓΟΥΜΕ τον ήχο!
+      // ΑΝ ΕΙΝΑΙ MP4 (ΒΙΝΤΕΟ ΚΛΙΠ): Φορτώνουμε το mp4 απευθείας στον browser και ανοίγουμε τον ήχο!
       if (videoElement) {
         videoElement.src = track.fileUrl;
-        videoElement.muted = false; // Ακούγεται ο ήχος του βίντεο κλιπ!
+        videoElement.load();
+        videoElement.muted = false; // Ακούγεται ο ήχος του βίντεο κλιπ
+        videoElement.play().catch(e => console.log(e));
         videoElement.style.display = 'block';
         document.getElementById('video-mute-icon').className = "fas fa-volume-up";
       }
     }
 
-    // Κλείνουμε αυτόματα το παράθυρο της λίστας για να βλέπει ο χρήστης τον player
+    // Κλείνουμε αυτόματα το παράθυρο της λίστας
     togglePlaylistView();
   }
 
