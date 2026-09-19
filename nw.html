@@ -362,7 +362,12 @@
     </div>
     <!-- 🎶 ΤΟ ΚΡΥΦΟ ΠΛΑΙΣΙΟ ΤΗΣ ΛΙΣΤΑΣ ΤΡΑΓΟΥΔΙΩΝ ΜΕΣΑ ΣΤΟΝ PLAYER -->
     <div id="embedded-playlist" style="display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; border-radius: 10px; background: #14181f; box-sizing: border-box; padding: 15px; overflow-y: auto; z-index: 5;">
-      <h3 style="margin: 0 0 10px 0; color: #00ffcc; font-size: 16px; font-weight: bold; text-align: center; border-bottom: 1px solid #2c3545; padding-bottom: 5px;">🎵 Λίστα Τραγουδιών</h3>
+           <!-- Ο ΤΙΤΛΟΣ ΜΑΖΙ ΜΕ ΤΟ ΚΟΚΚΙΝΟ ΚΟΥΜΠΙ ΚΛΕΙΣΙΜΑΤΟΣ (X) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2c3545; padding-bottom: 5px; margin-bottom: 15px;">
+        <span style="color: #00ffcc; font-size: 16px; font-weight: bold;">🎵 Λίστα Τραγουδιών</span>
+        <button onclick="togglePlaylistView()" style="background: #c0392b; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.2s;">X</button>
+      </div>
+
       
       <!-- Τα τραγούδια της λίστας (Κουμπιά) -->
       <div style="display: flex; flex-direction: column; gap: 8px;">
