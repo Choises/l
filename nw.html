@@ -596,24 +596,22 @@ if (volumeBar) {
             }
         }
     }
-        // Εναλλαγή Οθόνης: Εμφάνιση / Κρύψιμο της Λίστας Τραγουδιών
+          // Εναλλαγή Οθόνης: Εμφάνιση / Κρύψιμο της Λίστας Τραγουδιών
   function togglePlaylistView() {
     const playlistPanel = document.getElementById('embedded-playlist');
     const chatFrame = document.getElementById('embedded-chat');
     const videoElement = document.getElementById('bg-video');
 
-    if (!playlistPanel || !videoElement) return;
+    if (!playlistPanel) return;
 
-    if (playlistPanel.style.display === 'none') {
-      // 1. Εμφανίζουμε τη Λίστα
+    // Έλεγχος: Αν είναι κρυμμένη η λίστα, την εμφανίζουμε. Αν είναι ανοιχτή, την κλείνουμε!
+    if (playlistPanel.style.display === 'none' || playlistPanel.style.display === '') {
       playlistPanel.style.display = 'block';
-      // 2. Κλείνουμε το βίντεο και το chat για να ελευθερωθεί ο χώρος
-      videoElement.style.display = 'none';
+      if (videoElement) videoElement.style.display = 'none';
       if (chatFrame) chatFrame.style.display = 'none';
     } else {
-      // Κλείνουμε τη λίστα και επαναφέρουμε το ζωντανό βίντεο
       playlistPanel.style.display = 'none';
-      videoElement.style.display = 'block';
+      if (videoElement) videoElement.style.display = 'block';
     }
   }
 
